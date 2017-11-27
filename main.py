@@ -62,7 +62,7 @@ def draw(screen):
     """
     Draw things to the window. Called once per frame.
     """
-    screen.fill((0 ,0 ,0))
+    screen.fill((0, 0, 0))
     pygame.draw.circle(screen, (100, 0, 100), (rocket.coordinates[0], rocket.coordinates[1]), 20, 0)
 
     # Flip the display so that the things we drew actually show up.
