@@ -2,17 +2,15 @@
 # Import non-standard modules.
 import pygame
 import math
-import Body
+from Body import Body
 from pygame.locals import *
-import Rocket
+from Rocket import Rocket
 
 
-class Rocket (object):
-    velocity = (0,0)
-    coordinates = (0,0)
 
-rocket = Rocket()
-earth = Body("Earth", 10, 10, 10, 10, 10, 10)
+rocket = Rocket(100, 100, 4, 1)
+earth = Body("Earth", 300, 300, 0, 0, 30, 1000)
+moon = Body("Moon", 300, 400, 3, 0, 4, 10)
 
 def update(dt):
     """
@@ -32,38 +30,47 @@ def update(dt):
         # whenever someone tries to exit.
         if event.type == KEYDOWN:
             if event.key == K_LEFT:
-                rocket.velocity = (rocket.velocity[0]-1, rocket.velocity[1])
+                rocket.x_vel -= 1
             if event.key == K_RIGHT:
-                rocket.velocity = (rocket.velocity[0]+1, rocket.velocity[1])
+                rocket.x_vel += 1
             if event.key == K_DOWN:
-                rocket.velocity = (rocket.velocity[0], rocket.velocity[1]+1)
+                rocket.y_vel += 1
             if event.key == K_UP:
-                rocket.velocity = (rocket.velocity[0], rocket.velocity[1]-1)
+                rocket.y_vel -= 1
         if event.type == QUIT:
             pygame.quit()  # Opposite of pygame.init
             sys.exit()  # Not including this line crashes the script on Windows. Possibly
             # on other operating systems too, but I don't know for sure.
             # Handle other events as you wish.
-    print rocket.velocity
-    rocket.coordinates = (rocket.coordinates[0]+rocket.velocity[0], rocket.coordinates[1]+rocket.velocity[1])
-    print rocket.coordinates
+    gravitation(rocket, earth)
+    gravitation(moon, earth)
+    gravitation(rocket, moon)
+    velocityToPos(rocket)
+    velocityToPos(earth)
+    velocityToPos(moon)
+
+def velocityToPos(o):
+    o.x_pos += o.x_vel
+    o.y_pos += o.y_vel
 
 def gravitation(b1, b2):
-    g = 1
+    g = 0.01
     r = math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
     theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
-    f = g*b1.mass*b2.mass/r
-    b1.x_vel += f/b1.mass * math.cos(theta)
-    b1.y_vel += f/b1.mass * math.sin(theta)
-    b2.x_vel -= f/b2.mass * math.cos(theta)
-    b2.y_vel -= f/b2.mass * math.sin(theta)
+    f = g*b1.m*b2.m/r
+    b1.x_vel -= f/b1.m * math.sin(theta)
+    b1.y_vel -= f/b1.m * math.cos(theta)
+    b2.x_vel += f/b2.m * math.sin(theta)
+    b2.y_vel += f/b2.m * math.cos(theta)
 
 def draw(screen):
     """
     Draw things to the window. Called once per frame.
     """
     screen.fill((0, 0, 0))
-    pygame.draw.circle(screen, (100, 0, 100), (rocket.coordinates[0], rocket.coordinates[1]), 20, 0)
+    pygame.draw.circle(screen, (100, 0, 100), (int(rocket.x_pos), int(rocket.y_pos)), rocket.r, 0)
+    pygame.draw.circle(screen, (0, 100, 100), (int(earth.x_pos), int(earth.y_pos)), earth.r, 0)
+    pygame.draw.circle(screen, (100, 100, 0), (int(moon.x_pos), int(moon.y_pos)), moon.r, 0)
 
     # Flip the display so that the things we drew actually show up.
     pygame.display.flip()
