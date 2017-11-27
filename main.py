@@ -2,6 +2,7 @@
 # Import non-standard modules.
 import pygame
 import math
+import Body
 from pygame.locals import *
 import Rocket
 
@@ -11,6 +12,7 @@ class Rocket (object):
     coordinates = (0,0)
 
 rocket = Rocket()
+earth = Body("Earth", 10, 10, 10, 10, 10, 10)
 
 def update(dt):
     """
@@ -46,8 +48,15 @@ def update(dt):
     rocket.coordinates = (rocket.coordinates[0]+rocket.velocity[0], rocket.coordinates[1]+rocket.velocity[1])
     print rocket.coordinates
 
-def distanceToObject(x1, y1, x2, y2):
-    return math.hypot(math.fabs(x1-x2), math.fabs(y1-y2))
+def gravitation(b1, b2):
+    g = 1
+    r = math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
+    theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
+    f = g*b1.mass*b2.mass/r
+    b1.x_vel += f/b1.mass * math.cos(theta)
+    b1.y_vel += f/b1.mass * math.sin(theta)
+    b2.x_vel -= f/b2.mass * math.cos(theta)
+    b2.y_vel -= f/b2.mass * math.sin(theta)
 
 def draw(screen):
     """
