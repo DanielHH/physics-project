@@ -4,18 +4,22 @@ class Body(object):
 
     Attributes:
         name: a string representing the planet's name
-        position: floats x- and y-coordinates describing it's posittion in the Space universe.
-        velocity: floats x- and y-velocities
-        radius: float describing the radius of a body.
+        x_pos: float representing x-position
+        y_pos: float representing y-position
+        x_vel: float representing x-velocity
+        y_vel: float representing y-velocity
+        radius: float reprenting the radius of a body.
         mass: a float representing the body's weight in kg.
         """
 
-    def __init__(self, name, position, velocity, radius, mass):
+    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, radius, mass):
         """Returns a Body"""
         self.name = name
-        self.position = position
-        self.velocity = velocity
+        self.x_pos= x_pos
+        self.y_pos = y_pos
+        self.x_vel = x_vel
+        self.y_vel = y_vel
         self.radius = radius
         self.mass = mass
 
-    
+   # def update_position(self):
