@@ -12,14 +12,14 @@ class Body(object):
         mass: a float representing the body's weight in kg.
         """
 
-    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, radius, mass):
+    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, mass):
         """Returns a Body"""
         self.name = name
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.x_vel = x_vel
         self.y_vel = y_vel
-        self.radius = radius
+        self.r = r
         self.mass = mass
 
    #def update_position(self, x_pos, y_pos):

@@ -1,9 +1,9 @@
 
-class Rocket:
+class Rocket(object):
 
     mass = 0
-    x_pos = 0
-    y_pos = 0
+    x_pos = 200
+    y_pos = 200
     x_vel = 0
     y_vel = 0
     r = 0
