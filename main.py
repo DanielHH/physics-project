@@ -60,6 +60,10 @@ def runPyGame():
     width, height = 640, 480
     screen = pygame.display.set_mode((width, height))
 
+    # Set up the name of the game
+    name = 'Steal The Moon'
+    pygame.display.set_caption(name)
+
     # screen is the surface representing the window.
     # PyGame surfaces can be thought of as screen sections that you can draw onto.
     # You can also draw surfaces onto other surfaces, rotate surfaces, and transform surfaces.
