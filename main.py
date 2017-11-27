@@ -1,9 +1,15 @@
 
 # Import non-standard modules.
 import pygame
+import math
 from pygame.locals import *
 
-circle = [100 ,100]
+
+class Rocket (object):
+    velocity = (0,0)
+    coordinates = (0,0)
+
+rocket = Rocket()
 
 def update(dt):
     """
@@ -23,26 +29,31 @@ def update(dt):
         # whenever someone tries to exit.
         if event.type == KEYDOWN:
             if event.key == K_LEFT:
-                circle[0] -= 1
+                rocket.velocity = (rocket.velocity[0]-1, rocket.velocity[1])
             if event.key == K_RIGHT:
-                circle[0] += 1
+                rocket.velocity = (rocket.velocity[0]+1, rocket.velocity[1])
             if event.key == K_DOWN:
-                circle[1] += 1
+                rocket.velocity = (rocket.velocity[0], rocket.velocity[1]+1)
             if event.key == K_UP:
-                circle[1] -= 1
+                rocket.velocity = (rocket.velocity[0], rocket.velocity[1]-1)
         if event.type == QUIT:
             pygame.quit()  # Opposite of pygame.init
             sys.exit()  # Not including this line crashes the script on Windows. Possibly
             # on other operating systems too, but I don't know for sure.
             # Handle other events as you wish.
+    print rocket.velocity
+    rocket.coordinates = (rocket.coordinates[0]+rocket.velocity[0], rocket.coordinates[1]+rocket.velocity[1])
+    print rocket.coordinates
 
+def distanceToObject(x1, y1, x2, y2):
+    return math.hypot(math.fabs(x1-x2), math.fabs(y1-y2))
 
 def draw(screen):
     """
     Draw things to the window. Called once per frame.
     """
     screen.fill((0 ,0 ,0))
-    pygame.draw.circle(screen, (100, 0, 100), (circle[0], circle[1]), 20, 0)
+    pygame.draw.circle(screen, (100, 0, 100), (rocket.coordinates[0], rocket.coordinates[1]), 20, 0)
 
     # Flip the display so that the things we drew actually show up.
     pygame.display.flip()
