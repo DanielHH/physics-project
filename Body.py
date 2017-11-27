@@ -8,18 +8,16 @@ class Body(object):
         y_pos: float representing y-position
         x_vel: float representing x-velocity
         y_vel: float representing y-velocity
-        radius: float reprenting the radius of a body.
-        mass: a float representing the body's weight in kg.
+        r: float representing the radius of a body.
+        m: a float representing the body's weight in kg.
         """
 
-    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, radius, mass):
+    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, m):
         """Returns a Body"""
         self.name = name
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.x_vel = x_vel
         self.y_vel = y_vel
-        self.radius = radius
-        self.mass = mass
-
-   #def update_position(self, x_pos, y_pos):
+        self.r = r
+        self.m = m
