@@ -12,7 +12,7 @@ class Body(object):
         m: a float representing the body's weight in kg.
         """
 
-    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, m):
+    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, m, c):
         """Returns a Body"""
         self.name = name
         self.x_pos = x_pos
@@ -21,3 +21,4 @@ class Body(object):
         self.y_vel = y_vel
         self.r = r
         self.m = m
+        self.c = c

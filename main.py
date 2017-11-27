@@ -6,13 +6,11 @@ from Body import Body
 from pygame.locals import *
 from Rocket import Rocket
 
-
-
-rocket = Rocket(100, 100, 4, 1)
-earth = Body("Earth", 300, 300, 0, 0, 30, 1000)
-moon = Body("Moon", 300, 400, 3, 0, 4, 10)
+bodys = {}
+gamePaused = False
 
 def update(dt):
+    global gamePaused
     """
     Update game. Called once per frame.
     dt is the amount of time passed since last frame.
@@ -22,7 +20,6 @@ def update(dt):
     x += v * dt
 
     and this will scale your velocity based on time. Extend as necessary."""
-
     # Go through events that are passed to the script by the window.
     for event in pygame.event.get():
         # We need to handle these events. Initially the only one you'll want to care
@@ -30,32 +27,79 @@ def update(dt):
         # whenever someone tries to exit.
         if event.type == KEYDOWN:
             if event.key == K_LEFT:
-                rocket.x_vel -= 1
+                bodys["rocket"].x_vel -= 1
             if event.key == K_RIGHT:
-                rocket.x_vel += 1
+                bodys["rocket"].x_vel += 1
             if event.key == K_DOWN:
-                rocket.y_vel += 1
+                bodys["rocket"].y_vel += 1
             if event.key == K_UP:
-                rocket.y_vel -= 1
+                bodys["rocket"].y_vel -= 1
+            if event.key == K_SPACE:
+                restart()
         if event.type == QUIT:
             pygame.quit()  # Opposite of pygame.init
             sys.exit()  # Not including this line crashes the script on Windows. Possibly
             # on other operating systems too, but I don't know for sure.
             # Handle other events as you wish.
-    gravitation(rocket, earth)
-    gravitation(moon, earth)
-    gravitation(rocket, moon)
-    velocityToPos(rocket)
-    velocityToPos(earth)
-    velocityToPos(moon)
+    if not gamePaused:
+        gravitation(bodys["rocket"], bodys["earth"])
+        gravitation(bodys["moon"], bodys["earth"])
+        gravitation(bodys["rocket"], bodys["moon"])
+        gravitation(bodys["sun"], bodys["moon"])
+        gravitation(bodys["sun"], bodys["rocket"])
+        gravitation(bodys["sun"], bodys["earth"])
+        velocityToPos(bodys["rocket"])
+        velocityToPos(bodys["earth"])
+        velocityToPos(bodys["moon"])
+        velocityToPos(bodys["sun"])
+        if isCollison(bodys["moon"], bodys["earth"]):
+            gamePaused = True
+        if isCollison(bodys["moon"], bodys["rocket"]):
+            collison(bodys["moon"], bodys["rocket"])
+        if isCollison(bodys["earth"], bodys["rocket"]):
+            gamePaused = True
 
-def velocityToPos(o):
-    o.x_pos += o.x_vel
-    o.y_pos += o.y_vel
+
+def restart():
+    global gamePaused
+    bodys.clear()
+    rocket = Rocket("rocket", 0, 0, 0, 0, 10, 1, (100, 0, 100))
+    earth = Body("earth", 400, 450, 0, -3, 60, 100, (50, 100, 100))
+    moon = Body("moon", 300, 450, 0, -3.7, 20, 3, (100, 100, 0))
+    sun = Body("sun", 750, 450, 0, 0, 100, 1000, (0, 100, 100))
+    bodys[earth.name] = earth
+    bodys[moon.name] = moon
+    bodys[rocket.name] = rocket
+    bodys[sun.name] = sun
+    gamePaused = False
+
+def velocityToPos(b):
+
+    b.x_pos += b.x_vel
+    b.y_pos += b.y_vel
+
+def isCollison(b1, b2):
+    return b1.r+b2.r >= distance(b1, b2)
+
+def collison(b1, b2):
+    d = (b1.r + b2.r) - distance(b1, b2)
+    theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
+    b1.x_pos += d*math.cos(theta)/2
+    b2.x_pos -= d * math.cos(theta)/2
+    b1.y_pos += d * math.sin(theta) / 2
+    b2.y_pos -= d * math.sin(theta) / 2
+
+    b2.x_vel = (b1.m * b1.x_vel)/b2.m
+    b2.y_vel = (b1.m * b1.y_vel)/b2.m
+    b1.x_vel = -((b2.m * b2.x_vel) / b1.m)
+    b1.y_vel = -((b2.m * b2.y_vel) / b1.m)
+
+def distance(b1, b2):
+    return math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
 
 def gravitation(b1, b2):
     g = 0.01
-    r = math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
+    r = distance(b1, b2)
     theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
     f = g*b1.m*b2.m/r
     b1.x_vel -= f/b1.m * math.sin(theta)
@@ -63,14 +107,15 @@ def gravitation(b1, b2):
     b2.x_vel += f/b2.m * math.sin(theta)
     b2.y_vel += f/b2.m * math.cos(theta)
 
+
 def draw(screen):
     """
     Draw things to the window. Called once per frame.
     """
+
     screen.fill((0, 0, 0))
-    pygame.draw.circle(screen, (100, 0, 100), (int(rocket.x_pos), int(rocket.y_pos)), rocket.r, 0)
-    pygame.draw.circle(screen, (0, 100, 100), (int(earth.x_pos), int(earth.y_pos)), earth.r, 0)
-    pygame.draw.circle(screen, (100, 100, 0), (int(moon.x_pos), int(moon.y_pos)), moon.r, 0)
+    for b in bodys:
+        pygame.draw.circle(screen, bodys[b].c, (int(bodys[b].x_pos), int(bodys[b].y_pos)), bodys[b].r, 0)
 
     # Flip the display so that the things we drew actually show up.
     pygame.display.flip()
@@ -85,7 +130,7 @@ def runPyGame():
     fpsClock = pygame.time.Clock()
 
     # Set up the window.
-    width, height = 640, 480
+    width, height = 1500, 700
     screen = pygame.display.set_mode((width, height))
 
     # Set up the name of the game
@@ -96,6 +141,7 @@ def runPyGame():
     # PyGame surfaces can be thought of as screen sections that you can draw onto.
     # You can also draw surfaces onto other surfaces, rotate surfaces, and transform surfaces.
 
+    restart()
     # Main game loop.
     dt = 1 / fps  # dt is the time since last frame.
     while True:  # Loop forever!
