@@ -101,8 +101,8 @@ def collison(b1, b2):
             x_vel = ((b1.m * b1.x_vel) + (b2.m * b2.x_vel)) / (b2.m+b1.m)
             y_vel = ((b1.m * b1.y_vel) + (b2.m * b2.y_vel)) / (b2.m + b1.m)
             r = math.sqrt(((math.pi * math.pow(b1.r, 2)) + (math.pi * math.pow(b2.r, 2)))/math.pi)
-            x_pos = b1.x_pos
-            y_pos = b1.y_pos
+            x_pos = b1.x_pos + ((1-(b1.r/distance(b1,b2))) * (b2.x_pos - b1.x_pos))
+            y_pos = b1.y_pos + ((1-(b1.r/distance(b1,b2))) * (b2.y_pos - b1.y_pos))
             m = b1.m+b2.m
             c = (b1.c[0], b2.c[1], b1.c[2])
             p = False
