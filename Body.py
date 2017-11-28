@@ -10,9 +10,10 @@ class Body(object):
         y_vel: float representing y-velocity
         r: float representing the radius of a body.
         m: a float representing the body's weight in kg.
+        p: booleans pushable
         """
 
-    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, m, c):
+    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, m, c, p):
         """Returns a Body"""
         self.name = name
         self.x_pos = x_pos
@@ -22,3 +23,4 @@ class Body(object):
         self.r = r
         self.m = m
         self.c = c
+        self.p = p

@@ -3,7 +3,7 @@ class Rocket:
     angle = 0
     thruster_force = 40
 
-    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, m, c):
+    def __init__(self, name, x_pos, y_pos, x_vel, y_vel, r, m, c, p):
         self.name = name
         self.x_pos = x_pos
         self.y_pos = y_pos
@@ -12,4 +12,5 @@ class Rocket:
         self.r = r
         self.m = m
         self.c = c
+        self.p = p
 

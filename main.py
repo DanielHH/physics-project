@@ -2,6 +2,7 @@
 # Import non-standard modules.
 import pygame
 import math
+import itertools
 from Body import Body
 from pygame.locals import *
 from Rocket import Rocket
@@ -42,31 +43,28 @@ def update(dt):
             # on other operating systems too, but I don't know for sure.
             # Handle other events as you wish.
     if not gamePaused:
-        gravitation(bodys["rocket"], bodys["earth"])
-        gravitation(bodys["moon"], bodys["earth"])
-        gravitation(bodys["rocket"], bodys["moon"])
-        gravitation(bodys["sun"], bodys["moon"])
-        gravitation(bodys["sun"], bodys["rocket"])
-        gravitation(bodys["sun"], bodys["earth"])
-        velocityToPos(bodys["rocket"])
-        velocityToPos(bodys["earth"])
-        velocityToPos(bodys["moon"])
-        velocityToPos(bodys["sun"])
-        if isCollison(bodys["moon"], bodys["earth"]):
-            gamePaused = True
-        if isCollison(bodys["moon"], bodys["rocket"]):
-            collison(bodys["moon"], bodys["rocket"])
-        if isCollison(bodys["earth"], bodys["rocket"]):
-            gamePaused = True
+        combinations = itertools.combinations(bodys, 2)
+        for c in combinations:
+            print c[0], c[1]
+            gravitation(bodys[c[0]], bodys[c[1]])
+            if isCollison(bodys[c[0]], bodys[c[1]]):
+                if bodys[c[0]].p == True and bodys[c[1]].p == True:
+                    collison(bodys[c[0]], bodys[c[1]])
+                else:
+                    if c[0] == "rocket" or c[1] == "rocket":
+                        gamePaused = True
+                    #todo make function that remove body and give its force to the larger body make else here
+        for b in bodys:
+            velocityToPos(bodys[b])
 
 
 def restart():
     global gamePaused
     bodys.clear()
-    rocket = Rocket("rocket", 0, 0, 0, 0, 10, 10, (100, 0, 100))
-    earth = Body("earth", 400, 450, 0, -3, 60, 1000, (50, 100, 100))
-    moon = Body("moon", 300, 450, 0, -3.7, 20, 30, (100, 0, 0))
-    sun = Body("sun", 750, 450, 0, 0, 100, 10000, (100, 100, 0))
+    rocket = Rocket("rocket", 0, 0, 0, 0, 10, 10, (100, 0, 100), True)
+    earth = Body("earth", 400, 450, 0, -3, 60, 1000, (50, 100, 100), False)
+    moon = Body("moon", 300, 450, 0, -3.7, 20, 30, (100, 0, 0), True)
+    sun = Body("sun", 750, 450, 0, 0, 100, 10000, (100, 100, 0), False)
     bodys[earth.name] = earth
     bodys[moon.name] = moon
     bodys[rocket.name] = rocket
