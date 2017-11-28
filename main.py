@@ -63,10 +63,10 @@ def update(dt):
 def restart():
     global gamePaused
     bodys.clear()
-    rocket = Rocket("rocket", 0, 0, 0, 0, 10, 1, (100, 0, 100))
-    earth = Body("earth", 400, 450, 0, -3, 60, 100, (50, 100, 100))
-    moon = Body("moon", 300, 450, 0, -3.7, 20, 3, (100, 100, 0))
-    sun = Body("sun", 750, 450, 0, 0, 100, 1000, (0, 100, 100))
+    rocket = Rocket("rocket", 0, 0, 0, 0, 10, 10, (100, 0, 100))
+    earth = Body("earth", 400, 450, 0, -3, 60, 1000, (50, 100, 100))
+    moon = Body("moon", 300, 450, 0, -3.7, 20, 30, (100, 0, 0))
+    sun = Body("sun", 750, 450, 0, 0, 100, 10000, (100, 100, 0))
     bodys[earth.name] = earth
     bodys[moon.name] = moon
     bodys[rocket.name] = rocket
@@ -98,7 +98,7 @@ def distance(b1, b2):
     return math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
 
 def gravitation(b1, b2):
-    g = 0.01
+    g = 0.001
     r = distance(b1, b2)
     theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
     f = g*b1.m*b2.m/r
@@ -117,6 +117,15 @@ def draw(screen):
     for b in bodys:
         pygame.draw.circle(screen, bodys[b].c, (int(bodys[b].x_pos), int(bodys[b].y_pos)), bodys[b].r, 0)
 
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    x_vel = myfont.render("Velocity in X: " + str(bodys["rocket"].x_vel), False, (100, 100, 100))
+    y_vel = myfont.render("Velocity in Y: " + str(bodys["rocket"].y_vel), False, (100, 100, 100))
+    screen.blit(x_vel, (10, 10))
+    screen.blit(y_vel, (10, 40))
+    x_pos = myfont.render("Pos in X: " + str(bodys["rocket"].x_pos), False, (100, 100, 100))
+    y_pos = myfont.render("Pos in Y: " + str(bodys["rocket"].y_pos), False, (100, 100, 100))
+    screen.blit(x_pos, (10, 70))
+    screen.blit(y_pos, (10, 100))
     # Flip the display so that the things we drew actually show up.
     pygame.display.flip()
 
@@ -124,6 +133,9 @@ def draw(screen):
 def runPyGame():
     # Initialise PyGame.
     pygame.init()
+    pygame.font.init()  # you have to call this at the start,
+    # if you want to use this module.
+
 
     # Set up the clock. This will tick every frame and thus maintain a relatively constant framerate. Hopefully.
     fps = 60.0
