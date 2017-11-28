@@ -8,6 +8,9 @@ from pygame.locals import *
 from Rocket import Rocket
 
 bodys = {}
+x_offset = 0
+y_offset = 0
+center = "sun"
 gamePaused = False
 
 def update(dt):
@@ -45,23 +48,20 @@ def update(dt):
     if not gamePaused:
         combinations = itertools.combinations(bodys, 2)
         for c in combinations:
-            print c[0], c[1]
-            gravitation(bodys[c[0]], bodys[c[1]])
-            if isCollison(bodys[c[0]], bodys[c[1]]):
-                if bodys[c[0]].p == True and bodys[c[1]].p == True:
+            if c[0] in bodys and c[1] in bodys:
+                gravitation(bodys[c[0]], bodys[c[1]])
+                if isCollison(bodys[c[0]], bodys[c[1]]):
                     collison(bodys[c[0]], bodys[c[1]])
-                else:
-                    if c[0] == "rocket" or c[1] == "rocket":
-                        gamePaused = True
-                    #todo make function that remove body and give its force to the larger body make else here
         for b in bodys:
             velocityToPos(bodys[b])
 
 
 def restart():
     global gamePaused
+    global center
     bodys.clear()
-    rocket = Rocket("rocket", 0, 0, 0, 0, 10, 10, (100, 0, 100), True)
+    center = "sun"
+    rocket = Rocket("rocket", 100, 100, 0, 0, 10, 10, (100, 0, 100), True)
     earth = Body("earth", 400, 450, 0, -3, 60, 1000, (50, 100, 100), False)
     moon = Body("moon", 300, 450, 0, -3.7, 20, 30, (100, 0, 0), True)
     sun = Body("sun", 750, 450, 0, 0, 100, 10000, (100, 100, 0), False)
@@ -77,20 +77,45 @@ def velocityToPos(b):
     b.y_pos += b.y_vel
 
 def isCollison(b1, b2):
-    return b1.r+b2.r >= distance(b1, b2)
+    return b1.r+b2.r > distance(b1, b2)
 
 def collison(b1, b2):
-    d = (b1.r + b2.r) - distance(b1, b2)
-    theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
-    b1.x_pos += d*math.cos(theta)/2
-    b2.x_pos -= d * math.cos(theta)/2
-    b1.y_pos += d * math.sin(theta) / 2
-    b2.y_pos -= d * math.sin(theta) / 2
+    global gamePaused
+    global center
+    if b1.p and b2.p:
+        d = (b1.r + b2.r) - distance(b1, b2)
+        theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
+        b1.x_pos += d * math.cos(theta) / 2
+        b2.x_pos -= d * math.cos(theta) / 2
+        b1.y_pos += d * math.sin(theta) / 2
+        b2.y_pos -= d * math.sin(theta) / 2
 
-    b2.x_vel = (b1.m * b1.x_vel)/b2.m
-    b2.y_vel = (b1.m * b1.y_vel)/b2.m
-    b1.x_vel = -((b2.m * b2.x_vel) / b1.m)
-    b1.y_vel = -((b2.m * b2.y_vel) / b1.m)
+        b2.x_vel = (b1.m * b1.x_vel) / b2.m
+        b2.y_vel = (b1.m * b1.y_vel) / b2.m
+        b1.x_vel = -((b2.m * b2.x_vel) / b1.m)
+        b1.y_vel = -((b2.m * b2.y_vel) / b1.m)
+    else:
+        if b1.name == "rocket" or b2.name == "rocket":
+            gamePaused = True
+        else:
+            x_vel = ((b1.m * b1.x_vel) + (b2.m * b2.x_vel)) / (b2.m+b1.m)
+            y_vel = ((b1.m * b1.y_vel) + (b2.m * b2.y_vel)) / (b2.m + b1.m)
+            r = math.sqrt(((math.pi * math.pow(b1.r, 2)) + (math.pi * math.pow(b2.r, 2)))/math.pi)
+            x_pos = b1.x_pos
+            y_pos = b1.y_pos
+            m = b1.m+b2.m
+            c = (b1.c[0], b2.c[1], b1.c[2])
+            p = False
+            new_body = Body(b1.name+b2.name,x_pos, y_pos, x_vel, y_vel, r, m, c, p)
+            bodys[new_body.name] = new_body
+            for b in bodys:
+                print b
+            if b1.name == center or b2.name == center:
+               center = b1.name+b2.name
+            del bodys[b1.name]
+            del bodys[b2.name]
+            for b in bodys:
+                print "after " + b
 
 def distance(b1, b2):
     return math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
@@ -113,7 +138,12 @@ def draw(screen):
 
     screen.fill((0, 0, 0))
     for b in bodys:
-        pygame.draw.circle(screen, bodys[b].c, (int(bodys[b].x_pos), int(bodys[b].y_pos)), bodys[b].r, 0)
+        if b != center:
+            print"draw " + b
+            pygame.draw.circle(screen, bodys[b].c, (int(bodys[b].x_pos - int(bodys[center].x_pos)) + x_offset,
+                                                    int(bodys[b].y_pos - int(bodys[center].y_pos)) + y_offset),
+                                                    int(bodys[b].r), 0)
+    pygame.draw.circle(screen, bodys[center].c, (x_offset, y_offset), int(bodys[center].r), 0)
 
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     x_vel = myfont.render("Velocity in X: " + str(bodys["rocket"].x_vel), False, (100, 100, 100))
@@ -124,11 +154,20 @@ def draw(screen):
     y_pos = myfont.render("Pos in Y: " + str(bodys["rocket"].y_pos), False, (100, 100, 100))
     screen.blit(x_pos, (10, 70))
     screen.blit(y_pos, (10, 100))
+    c_x_pos = myfont.render("Center pos in X: " + str(bodys[center].x_pos), False, (100, 100, 100))
+    c_y_pos = myfont.render("center pos in Y: " + str(bodys[center].y_pos), False, (100, 100, 100))
+    screen.blit(c_x_pos, (10, 130))
+    screen.blit(c_y_pos, (10, 160))
+    if gamePaused:
+        pausedgame = myfont.render("You crashed, press space to restart", False, (100, 100, 100))
+        screen.blit(pausedgame, (x_offset - 300, y_offset - 200))
     # Flip the display so that the things we drew actually show up.
     pygame.display.flip()
 
 
 def runPyGame():
+    global x_offset
+    global y_offset
     # Initialise PyGame.
     pygame.init()
     pygame.font.init()  # you have to call this at the start,
@@ -141,6 +180,8 @@ def runPyGame():
 
     # Set up the window.
     width, height = 1500, 700
+    x_offset = width/2
+    y_offset = height/2
     screen = pygame.display.set_mode((width, height))
 
     # Set up the name of the game
