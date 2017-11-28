@@ -63,7 +63,7 @@ def restart():
     global gamePaused
     bodys.clear()
     #run gamemode function here:
-    bigBang()
+    sunSystem()
     gamePaused = False
 
 def sunSystem():
@@ -89,23 +89,34 @@ def unElasticTestWithAngle():
 
 def bigBang():
     global monitor
+    global center
     rocket = Rocket("rocket", 100, 100, 0, 0, 10, 10, (100, 100, 100), True)
     bodys[rocket.name] = rocket
     monitor = "rocket"
-    for i in range(50):
+    center = "rocket"
+    for i in range(120):
         r1 = random.randint(0, 100)
         r2 = random.randint(0, 100)
         r3 = random.randint(0, 100)
-        x = random.randint(0, 1080)
-        y = random.randint(0, 720)
+        x = random.randint(0, 2080)
+        y = random.randint(0, 1420)
         p = random.randint(0, 1)
         x_vel = random.randint(0, 10)
-        y_vel = random.randint(0, 10)
-        r = random.randint(1, 40)
-        m = random.randint(1, 1000)
-        addBody(str(i), x, y, x_vel, y_vel, r, m, (r1, r2, r3), True)
+        y_vel = random.randint(0, 20)
+        r = random.randint(1, 20)
+        m = random.randint(1, 100)
+        addBody(str(i), x, y, x_vel, y_vel, r, m, (r1, r2, r3), p)
 
 
+def drawTest():
+    global monitor
+    global center
+    rocket = Rocket("rocket", width + 100, height + 100, 0, 0, 10, 10, (100, 100, 100), True)
+    bodys[rocket.name] = rocket
+    monitor = "rocket"
+    center = "rocket"
+    addBody("2", width, height, 0, 0, 60, 1000, (50, 100, 100), False)
+    addBody("2", width- 60, height- 60, 0, 0, 60, 1000, (50, 100, 100), False)
 
 def addBody(name, x_pos, y_pos, x_vel, y_vel, r, m, c, p):
     body = Body(name, x_pos, y_pos, x_vel, y_vel, r, m, c, p)
@@ -188,8 +199,8 @@ def draw(screen):
 
     for b in bodys:
         if b != center:
-            if width - bodys[b].x_pos - x_c + x_offset + bodys[b].r > 0 and \
-                                                    height - bodys[b].y_pos - y_c + y_offset + bodys[b].r:
+            if (width - (bodys[b].x_pos - x_c + x_offset - bodys[b].r)) >= 0 and \
+                    (height - (bodys[b].y_pos - y_c + y_offset - bodys[b].r)) >= 0:
 
                 pygame.draw.circle(screen, bodys[b].c, (int(bodys[b].x_pos - x_c) + x_offset,
                                                         int(bodys[b].y_pos - y_c) + y_offset),
