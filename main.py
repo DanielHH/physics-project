@@ -33,14 +33,6 @@ def update(dt):
         # about is the QUIT event, because if you don't handle it, your game will crash
         # whenever someone tries to exit.
         if event.type == KEYDOWN:
-            if event.key == K_LEFT:
-                bodys["rocket"].x_vel -= 1
-            if event.key == K_RIGHT:
-                bodys["rocket"].x_vel += 1
-            if event.key == K_DOWN:
-                bodys["rocket"].y_vel += 1
-            if event.key == K_UP:
-                bodys["rocket"].y_vel -= 1
             if event.key == K_SPACE:
                 restart()
         if event.type == QUIT:
@@ -49,6 +41,17 @@ def update(dt):
             # on other operating systems too, but I don't know for sure.
             # Handle other events as you wish.
     if not gamePaused:
+        keys = pygame.key.get_pressed()
+        time = dt*0.01
+        if keys[K_LEFT]:
+            bodys["rocket"].x_vel -= 1*time
+        if keys[K_RIGHT]:
+            bodys["rocket"].x_vel += 1*time
+        if keys[K_DOWN]:
+            bodys["rocket"].y_vel += 1*time
+        if keys[K_UP]:
+            bodys["rocket"].y_vel -= 1*time
+
         combinations = itertools.combinations(bodys, 2)
         for c in combinations:
             if c[0] in bodys and c[1] in bodys:
