@@ -14,12 +14,18 @@ x_offset = 0
 y_offset = 0
 center = ""
 monitor = ""
+distanceMoon = 0
 gamePaused = False
 gameOver = False
 win = False
 isObjective = False
 b1 = ""
+b1_2 = ""
+b1_3 = ""
+b1_4 = ""
 b2 = ""
+b3 = ""
+b4 = ""
 
 def update(dt):
     global gamePaused
@@ -40,10 +46,26 @@ def update(dt):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = pygame.mouse.get_pos()
             if b1.collidepoint(pos):
+                elasticTest()
+                restart()
+            if b1_2.collidepoint(pos):
+                elasticTestWithAngle()
+                restart()
+            if b1_3.collidepoint(pos):
+                unElasticTest()
+                restart()
+            if b1_4.collidepoint(pos):
+                unElasticTestWithAngle()
+                restart()
+
+            if b2.collidepoint(pos):
+                gravityTest()
+                restart()
+            if b3.collidepoint(pos):
                 sunSystem()
                 restart()
-            if b2.collidepoint(pos):
-                rockyraod()
+            if b4.collidepoint(pos):
+                bigBang()
                 restart()
         if event.type == KEYDOWN:
             if event.key == K_SPACE:
@@ -90,13 +112,13 @@ def objective():
     global gamePaused
     global win
     global gameOver
+    global distanceMoon
     if "moon" in bodys:
         b1 = bodys["moon"]
-        b2 = bodys[center]
-        dist = math.fabs(math.hypot(b1.x_pos - b2.x_pos, b1.y_pos - b2.y_pos))
-        if dist > 1000:
+        b2 = bodys["earth"]
+        distanceMoon = math.fabs(math.hypot(b1.x_pos - b2.x_pos, b1.y_pos - b2.y_pos))
+        if distanceMoon > 1000:
             win = True
-            print win
     else:
         gameOver = True
         gamePaused = True
@@ -104,34 +126,73 @@ def objective():
 def sunSystem():
     global isObjective
     global center
+    global monitor
     isObjective = True
     bodys.clear()
     center = "sun"
+    monitor = ""
     rocket = Rocket("rocket", 100, 100, 0, 0, 5, 10, (100, 0, 100), True)
     bodys[rocket.name] = rocket
-    addBody("earth", 400, 450, 0, -8, 60, 1000, (50, 100, 100), False)
-    addBody("moon", 300, 450, 0, -10, 10, 10, (100, 0, 0), True)
-    addBody("sun", 750, 450, 0, 0, 100, 10000, (100, 100, 0), False)
+    addBody("earth", 400, 450, 0, -10, 30, 2000, (50, 100, 100), False)
+    addBody("moon", 340, 450, 0, -6, 10, 10, (100, 0, 0), True)
+    addBody("sun", 750, 450, 0, 0, 70, 20000, (100, 100, 0), False)
+
+def gravityTest():
+    global isObjective
+    global center
+    global monitor
+    isObjective = False
+    bodys.clear()
+    monitor = ""
+    center = "center"
+    addBody("center", x_offset, y_offset, 0, 0, 40, 10000, (100, 100, 0), False)
+
+    for i in range(100):
+        r1 = random.randint(0, 100)
+        r2 = random.randint(0, 100)
+        r3 = random.randint(0, 100)
+        x = random.randint(0, 1080)
+        y = random.randint(0, 720)
+        r = random.randint(1, 10)
+        addBody(str(i), x, y, 0, 0, r, 3, (r1, r2, r3), True)
 
 def unElasticTest():
-    global monitor
+    global monitor, center
     bodys.clear()
     monitor = "2"
+    center = ""
     addBody("1", 0, 450, 4, 0, 60, 1000, (50, 100, 100), False)
     addBody("2", 1280, 450, -4, 0, 60, 1000, (50, 100, 100), False)
 
 def unElasticTestWithAngle():
-    global monitor
+    global monitor, center
     bodys.clear()
     monitor = "2"
+    center = ""
     addBody("1", 640, 0, 0, 4, 60, 1000, (50, 100, 100), False)
     addBody("2", 1280, 550, -4, 0, 60, 1000, (50, 100, 100), False)
+
+def elasticTest():
+    global monitor, center
+    bodys.clear()
+    monitor = "2"
+    center = ""
+    addBody("1", 0, 450, 4, 0, 60, 1000, (100, 0, 0), True)
+    addBody("2", 1280, 450, -4, 0, 60, 1000, (0, 100, 0), True)
+
+def elasticTestWithAngle():
+    global monitor, center
+    bodys.clear()
+    monitor = "2"
+    center = ""
+    addBody("1", 640, 0, 0, 4, 60, 1000, (100, 0, 0), True)
+    addBody("2", 1280, 550, -4, 0, 60, 1000, (0, 100, 0), True)
 
 def bigBang():
     global monitor
     global center
     bodys.clear()
-    rocket = Rocket("rocket", 100, 100, 0, 0, 10, 10, (100, 100, 100), True)
+    rocket = Rocket("rocket", width/2, height/2, 0, 0, 10, 10, (100, 100, 100), True)
     bodys[rocket.name] = rocket
     monitor = "rocket"
     center = "rocket"
@@ -151,6 +212,8 @@ def bigBang():
 def rockyraod():
     global monitor
     global center
+    global isObjective
+    isObjective = False
     center = ""
     bodys.clear()
     rocket = Rocket("rocket", 100, 100, 0, 0, 10, 100, (100, 100, 100), True)
@@ -286,6 +349,10 @@ def draw(screen):
         y_pos = myfont.render("Pos in Y: " + str(bodys[monitor].y_pos), False, (100, 100, 100))
         screen.blit(x_pos, (10, 100))
         screen.blit(y_pos, (10, 130))
+
+    if isObjective:
+        moon = myfont.render("Moons distance from earth: " + str(distanceMoon), False, (100, 100, 100))
+        screen.blit(moon, (width - 400, 20))
     if gamePaused:
         drawPauseMenu(screen, myfont)
     if win:
@@ -298,12 +365,28 @@ def draw(screen):
     pygame.display.flip()
 
 def drawPauseMenu(screen, font):
-    global b1, b2
+    global b1, b1_2, b1_3, b1_4, b2, b3, b4
 
-    b1_text = font.render("Solar system", False, (0, 0, 0))
-    b1 = pygame.draw.rect(screen, (100, 100, 100), ((width/2) - 100, (height/2) -100, 200, 50))
-    screen.blit(b1_text, ((width/2) - 100 + 20, (height/2) - 100 + 20))
-    b2 = pygame.draw.rect(screen, (75, 75, 75), ((width/2) - 100, height/2, 200, 50))
+
+    b1 = pygame.draw.rect(screen, (100, 100, 100), ((width/2)-100, (height/2) -100, 50, 50))
+
+    b1_2 = pygame.draw.rect(screen, (90, 90, 90), ((width / 2) - 50, (height / 2) - 100, 50, 50))
+    b1_3 = pygame.draw.rect(screen, (100, 100, 100), ((width / 2) , (height / 2) - 100, 50, 50))
+    b1_4 = pygame.draw.rect(screen, (90, 90, 90), ((width / 2) + 50, (height / 2) - 100, 50, 50))
+    b1_text = font.render("Collisions", False, (0, 0, 0))
+    screen.blit(b1_text, ((width / 2) - 100 + 20, (height / 2) - 100 + 20))
+
+    b2 = pygame.draw.rect(screen, (75, 75, 75), ((width/2) - 100, (height/2), 200, 50))
+    b2_text = font.render("Gravity", False, (0, 0, 0))
+    screen.blit(b2_text, ((width / 2) - 100 + 20, (height / 2) + 20))
+
+    b3 = pygame.draw.rect(screen, (75, 75, 75), ((width / 2) - 100, (height / 2) + 100, 200, 50))
+    b3_text = font.render("Steal the moon", False, (0, 0, 0))
+    screen.blit(b3_text, ((width / 2) - 100 + 20, (height / 2) + 100 + 20))
+
+    b4 = pygame.draw.rect(screen, (75, 75, 75), ((width / 2) - 100, (height / 2) + 200, 200, 50))
+    b4_text = font.render("Random", False, (0, 0, 0))
+    screen.blit(b4_text, ((width / 2) - 100 + 20, (height / 2) + 200 + 20))
 
 
 
