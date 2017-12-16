@@ -28,7 +28,7 @@ b3 = ""
 b4 = ""
 
 def update(dt):
-    global gamePaused
+    global gamePaused, isObjective
     """
     Update game. Called once per frame.
     dt is the amount of time passed since last frame.
@@ -46,15 +46,19 @@ def update(dt):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = pygame.mouse.get_pos()
             if b1.collidepoint(pos):
+                isObjective = False
                 elasticTest()
                 restart()
             if b1_2.collidepoint(pos):
+                isObjective = False
                 elasticTestWithAngle()
                 restart()
             if b1_3.collidepoint(pos):
+                isObjective = False
                 unElasticTest()
                 restart()
             if b1_4.collidepoint(pos):
+                isObjective = False
                 unElasticTestWithAngle()
                 restart()
 
@@ -191,6 +195,8 @@ def elasticTestWithAngle():
 def bigBang():
     global monitor
     global center
+    global isObjective
+    isObjective = False
     bodys.clear()
     rocket = Rocket("rocket", width/2, height/2, 0, 0, 10, 10, (100, 100, 100), True)
     bodys[rocket.name] = rocket
@@ -205,7 +211,7 @@ def bigBang():
         p = random.randint(0, 1)
         x_vel = random.randint(0, 10)
         y_vel = random.randint(0, 20)
-        r = random.randint(1, 20)
+        r = random.randint(1, 30)
         m = random.randint(1, 100)
         addBody(str(i), x, y, x_vel, y_vel, r, m, (r1, r2, r3), True)
 
