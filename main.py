@@ -141,7 +141,7 @@ def sunSystem():
     rocket = Rocket("rocket", 100, 100, 0, 0, 5, 10, (100, 0, 100), True)
     bodys[rocket.name] = rocket
     addBody("earth", 500, 450, 0, -10, 30, 100000, (50, 100, 100), False)
-    addBody("moon", 445, 500, 1, -7, 10, 10, (100, 0, 0), True)
+    addBody("moon", 550, 500, 0, -13, 10, 10, (100, 0, 0), True)
     addBody("sun", 750, 450, 0, 0, 70, 4000000, (100, 100, 0), False)
 
 """ Game - Gravity """
