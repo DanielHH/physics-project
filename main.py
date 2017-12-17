@@ -140,8 +140,8 @@ def sunSystem():
     monitor = ""
     rocket = Rocket("rocket", 100, 100, 0, 0, 5, 10, (100, 0, 100), True)
     bodys[rocket.name] = rocket
-    addBody("earth", 500, 450, 0, -10, 30, 1800, (50, 100, 100), False)
-    addBody("moon", 440, 450, 0, -8, 10, 10, (100, 0, 0), True)
+    addBody("earth", 500, 450, 0, -10, 30, 100000, (50, 100, 100), False)
+    addBody("moon", 445, 500, 1, -7, 10, 10, (100, 0, 0), True)
     addBody("sun", 750, 450, 0, 0, 70, 4000000, (100, 100, 0), False)
 
 """ Game - Gravity """
@@ -179,7 +179,7 @@ def unElasticTestWithAngle():
     bodys.clear()
     monitor = "2"
     center = ""
-    addBody("1", 640, 0, 0, 4, 60, 1000, (50, 100, 100), False)
+    addBody("1", 620, 0, 0, 4, 60, 1000, (50, 100, 100), False)
     addBody("2", 1280, 550, -4, 0, 60, 1000, (50, 100, 100), False)
 
 """ Game - elastic collision """
