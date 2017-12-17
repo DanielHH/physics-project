@@ -10,7 +10,7 @@ from Rocket import Rocket
 import random
 
 width, height = 1280, 720
-bodies = {}
+bodys = {}
 x_offset = 0
 y_offset = 0
 center = ""
@@ -29,7 +29,7 @@ b3 = ""
 b4 = ""
 
 def update(dt):
-    global gamePaused
+    global gamePaused, isObjective
     """
     Update game. Called once per frame.
     dt is the amount of time passed since last frame.
@@ -47,15 +47,19 @@ def update(dt):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = pygame.mouse.get_pos()
             if b1.collidepoint(pos):
+                isObjective = False
                 elasticTest()
                 restart()
             if b1_2.collidepoint(pos):
+                isObjective = False
                 elasticTestWithAngle()
                 restart()
             if b1_3.collidepoint(pos):
+                isObjective = False
                 unElasticTest()
                 restart()
             if b1_4.collidepoint(pos):
+                isObjective = False
                 unElasticTestWithAngle()
                 restart()
 
@@ -79,24 +83,24 @@ def update(dt):
     if not gamePaused:
         keys = pygame.key.get_pressed()
         time = dt*0.01
-        if "rocket" in bodies:
+        if "rocket" in bodys:
             if keys[K_LEFT]:
-                bodies["rocket"].x_vel -= 1 * time
+                bodys["rocket"].x_vel -= 1 * time
             if keys[K_RIGHT]:
-                bodies["rocket"].x_vel += 1 * time
+                bodys["rocket"].x_vel += 1 * time
             if keys[K_DOWN]:
-                bodies["rocket"].y_vel += 1 * time
+                bodys["rocket"].y_vel += 1 * time
             if keys[K_UP]:
-                bodies["rocket"].y_vel -= 1 * time
+                bodys["rocket"].y_vel -= 1 * time
 
-        combinations = itertools.combinations(bodies, 2)
+        combinations = itertools.combinations(bodys, 2)
         for c in combinations:
-            if c[0] in bodies and c[1] in bodies:
-                gravitation(bodies[c[0]], bodies[c[1]])
-                if isCollison(bodies[c[0]], bodies[c[1]]):
-                    collison(bodies[c[0]], bodies[c[1]])
-        for b in bodies:
-            velocityToPos(bodies[b], dt)
+            if c[0] in bodys and c[1] in bodys:
+                gravitation(bodys[c[0]], bodys[c[1]])
+                if isCollison(bodys[c[0]], bodys[c[1]]):
+                    collison(bodys[c[0]], bodys[c[1]])
+        for b in bodys:
+            velocityToPos(bodys[b], dt)
     if isObjective:
         objective()
 
@@ -115,9 +119,9 @@ def objective():
     global win
     global gameOver
     global distanceMoon
-    if "moon" in bodies:
-        b1 = bodies["moon"]
-        b2 = bodies["earth"]
+    if "moon" in bodys:
+        b1 = bodys["moon"]
+        b2 = bodys["earth"]
         distanceMoon = math.fabs(math.hypot(b1.x_pos - b2.x_pos, b1.y_pos - b2.y_pos))
         if distanceMoon > 1000:
             win = True
@@ -130,11 +134,11 @@ def sunSystem():
     global center
     global monitor
     isObjective = True
-    bodies.clear()
+    bodys.clear()
     center = "sun"
     monitor = ""
     rocket = Rocket("rocket", 100, 100, 0, 0, 5, 10, (100, 0, 100), True)
-    bodies[rocket.name] = rocket
+    bodys[rocket.name] = rocket
     addBody("earth", 400, 450, 0, -10, 30, 2000, (50, 100, 100), False)
     addBody("moon", 340, 450, 0, -6, 10, 10, (100, 0, 0), True)
     addBody("sun", 750, 450, 0, 0, 70, 20000, (100, 100, 0), False)
@@ -144,7 +148,7 @@ def gravityTest():
     global center
     global monitor
     isObjective = False
-    bodies.clear()
+    bodys.clear()
     monitor = ""
     center = "center"
     addBody("center", x_offset, y_offset, 0, 0, 40, 10000, (100, 100, 0), False)
@@ -160,7 +164,7 @@ def gravityTest():
 
 def unElasticTest():
     global monitor, center
-    bodies.clear()
+    bodys.clear()
     monitor = "2"
     center = ""
     addBody("1", 0, 450, 4, 0, 60, 1000, (50, 100, 100), False)
@@ -168,7 +172,7 @@ def unElasticTest():
 
 def unElasticTestWithAngle():
     global monitor, center
-    bodies.clear()
+    bodys.clear()
     monitor = "2"
     center = ""
     addBody("1", 640, 0, 0, 4, 60, 1000, (50, 100, 100), False)
@@ -176,7 +180,7 @@ def unElasticTestWithAngle():
 
 def elasticTest():
     global monitor, center
-    bodies.clear()
+    bodys.clear()
     monitor = "2"
     center = ""
     addBody("1", 0, 450, 4, 0, 60, 1000, (100, 0, 0), True)
@@ -184,7 +188,7 @@ def elasticTest():
 
 def elasticTestWithAngle():
     global monitor, center
-    bodies.clear()
+    bodys.clear()
     monitor = "2"
     center = ""
     addBody("1", 640, 0, 0, 4, 60, 1000, (100, 0, 0), True)
@@ -193,9 +197,11 @@ def elasticTestWithAngle():
 def bigBang():
     global monitor
     global center
-    bodies.clear()
+    global isObjective
+    isObjective = False
+    bodys.clear()
     rocket = Rocket("rocket", width/2, height/2, 0, 0, 10, 10, (100, 100, 100), True)
-    bodies[rocket.name] = rocket
+    bodys[rocket.name] = rocket
     monitor = "rocket"
     center = "rocket"
     for i in range(120):
@@ -207,7 +213,7 @@ def bigBang():
         p = random.randint(0, 1)
         x_vel = random.randint(0, 10)
         y_vel = random.randint(0, 20)
-        r = random.randint(1, 20)
+        r = random.randint(1, 30)
         m = random.randint(1, 100)
         addBody(str(i), x, y, x_vel, y_vel, r, m, (r1, r2, r3), True)
 
@@ -217,9 +223,9 @@ def rockyroad():
     global isObjective
     isObjective = False
     center = ""
-    bodies.clear()
+    bodys.clear()
     rocket = Rocket("rocket", 100, 100, 0, 0, 10, 100, (100, 100, 100), True)
-    bodies[rocket.name] = rocket
+    bodys[rocket.name] = rocket
     monitor = "rocket"
     road = 0
     for i in range(120):
@@ -239,9 +245,9 @@ def rockyroad():
 def drawTest():
     global monitor
     global center
-    bodies.clear()
+    bodys.clear()
     rocket = Rocket("rocket", width + 100, height + 100, 0, 0, 10, 10, (100, 100, 100), True)
-    bodies[rocket.name] = rocket
+    bodys[rocket.name] = rocket
     monitor = "rocket"
     center = "rocket"
     addBody("2", width, height, 0, 0, 60, 1000, (50, 100, 100), False)
@@ -249,7 +255,7 @@ def drawTest():
 
 def addBody(name, x_pos, y_pos, x_vel, y_vel, r, m, c, p):
     body = Body(name, x_pos, y_pos, x_vel, y_vel, r, m, c, p)
-    bodies[body.name] = body
+    bodys[body.name] = body
 
 def velocityToPos(b, dt):
 
@@ -293,13 +299,13 @@ def collison(b1, b2):
             c = (b1.c[0], b2.c[1], b1.c[2])
             p = False
             new_body = Body(b1.name+b2.name,x_pos, y_pos, x_vel, y_vel, r, m, c, p)
-            bodies[new_body.name] = new_body
+            bodys[new_body.name] = new_body
             if b1.name == center or b2.name == center:
                center = b1.name+b2.name
             if b1.name == monitor or b2.name == monitor:
                 monitor = b1.name+b2.name
-            del bodies[b1.name]
-            del bodies[b2.name]
+            del bodys[b1.name]
+            del bodys[b2.name]
 
 def distance(b1, b2):
     return math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
@@ -325,30 +331,30 @@ def draw(screen):
     x_c = x_offset
     y_c = y_offset
     if center:
-        x_c = int(bodies[center].x_pos)
-        y_c = int(bodies[center].y_pos)
-        pygame.draw.circle(screen, bodies[center].c, (x_offset, y_offset), int(bodies[center].r), 0)
+        x_c = int(bodys[center].x_pos)
+        y_c = int(bodys[center].y_pos)
+        pygame.draw.circle(screen, bodys[center].c, (x_offset, y_offset), int(bodys[center].r), 0)
 
-    for b in bodies:
+    for b in bodys:
         if b != center:
-            if (width - (bodies[b].x_pos - x_c + x_offset - bodies[b].r)) >= 0 and \
-                    (height - (bodies[b].y_pos - y_c + y_offset - bodies[b].r)) >= 0:
+            if (width - (bodys[b].x_pos - x_c + x_offset - bodys[b].r)) >= 0 and \
+                    (height - (bodys[b].y_pos - y_c + y_offset - bodys[b].r)) >= 0:
 
-                pygame.draw.circle(screen, bodies[b].c, (int(bodies[b].x_pos - x_c) + x_offset,
-                                                         int(bodies[b].y_pos - y_c) + y_offset),
-                                   int(bodies[b].r), 0)
+                pygame.draw.circle(screen, bodys[b].c, (int(bodys[b].x_pos - x_c) + x_offset,
+                                                        int(bodys[b].y_pos - y_c) + y_offset),
+                                   int(bodys[b].r), 0)
 
 
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
-    if monitor in bodies:
-        name = myfont.render("Monitor of: " + str(bodies[monitor].name), False, (100, 100, 100))
+    if monitor in bodys:
+        name = myfont.render("Monitor of: " + str(bodys[monitor].name), False, (100, 100, 100))
         screen.blit(name, (10, 10))
-        x_vel = myfont.render("Velocity in X: " + str(bodies[monitor].x_vel), False, (100, 100, 100))
-        y_vel = myfont.render("Velocity in Y: " + str(bodies[monitor].y_vel), False, (100, 100, 100))
+        x_vel = myfont.render("Velocity in X: " + str(bodys[monitor].x_vel), False, (100, 100, 100))
+        y_vel = myfont.render("Velocity in Y: " + str(bodys[monitor].y_vel), False, (100, 100, 100))
         screen.blit(x_vel, (10, 40))
         screen.blit(y_vel, (10, 70))
-        x_pos = myfont.render("Pos in X: " + str(bodies[monitor].x_pos), False, (100, 100, 100))
-        y_pos = myfont.render("Pos in Y: " + str(bodies[monitor].y_pos), False, (100, 100, 100))
+        x_pos = myfont.render("Pos in X: " + str(bodys[monitor].x_pos), False, (100, 100, 100))
+        y_pos = myfont.render("Pos in Y: " + str(bodys[monitor].y_pos), False, (100, 100, 100))
         screen.blit(x_pos, (10, 100))
         screen.blit(y_pos, (10, 130))
 
