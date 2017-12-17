@@ -272,11 +272,16 @@ def collison(b1, b2):
     global monitor
     if b1.p and b2.p:
         d = (b1.r + b2.r) - distance(b1, b2)
-        theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
+        theta = math.atan2(b1.x_pos - b2.x_pos, b1.y_pos - b2.y_pos)
+        normal = get_vector((b1.x_pos,b1.y_pos), (b2.x_pos,  b2.y_pos))
+        dot_b1 = dot_product((b1.x_vel,b1.y_vel), normal)
+        dot_b2 = dot_product((b2.x_vel,b2.y_vel), normal)
+        p = float((2.0 * (dot_b1-dot_b2)) / (b1.m - b2.m))
         b1.x_pos += d * math.sin(theta) / 2
         b2.x_pos -= d * math.sin(theta) / 2
         b1.y_pos += d * math.cos(theta) / 2
         b2.y_pos -= d * math.cos(theta) / 2
+
 
         b2.x_vel = (b1.m * b1.x_vel) / b2.m
         b2.y_vel = (b1.m * b1.y_vel) / b2.m
@@ -306,6 +311,15 @@ def collison(b1, b2):
                 monitor = b1.name+b2.name
             del bodys[b1.name]
             del bodys[b2.name]
+
+def get_vector(p1, p2):
+    dis = math.hypot(p2[0] - p1[0], p2[1] - p1[1])
+    direction = (p2[0] - p1[0], p2[1] - p1[1])
+    normalized = (direction[0] / dis, direction[1] / dis)
+    return normalized
+
+def dot_product(v1, v2)
+    return sum([i*j for (i, j) in zip(v1, v2)])
 
 def distance(b1, b2):
     return math.hypot(math.fabs(b1.x_pos - b2.x_pos), math.fabs(b1.y_pos - b2.y_pos))
