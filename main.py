@@ -284,7 +284,7 @@ def collison(b1, b2):
         normal = get_vector((b1.x_pos,b1.y_pos), (b2.x_pos,  b2.y_pos))
         dot_b1 = dot_product((b1.x_vel,b1.y_vel), normal)
         dot_b2 = dot_product((b2.x_vel,b2.y_vel), normal)
-        p = float((2.0 * (dot_b1-dot_b2)) / (b1.m - b2.m))
+        p = float((2.0 * (dot_b1-dot_b2)) / (b1.m + b2.m))
         b1.x_pos += d * math.sin(theta) / 2
         b2.x_pos -= d * math.sin(theta) / 2
         b1.y_pos += d * math.cos(theta) / 2
@@ -333,7 +333,7 @@ def get_vector(p1, p2):
     normalized = (direction[0] / dis, direction[1] / dis)
     return normalized
 
-def dot_product(v1, v2)
+def dot_product(v1, v2):
     return sum([i*j for (i, j) in zip(v1, v2)])
 
 def distance(b1, b2):
