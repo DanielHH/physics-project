@@ -70,7 +70,7 @@ def update(dt):
                 sunSystem()
                 restart()
             if b4.collidepoint(pos):
-                bigBang()
+                rockyroad()
                 restart()
         if event.type == KEYDOWN:
             if event.key == K_SPACE:
@@ -129,6 +129,7 @@ def objective():
         gameOver = True
         gamePaused = True
 
+""" Game - Steal the Moon """
 def sunSystem():
     global isObjective
     global center
@@ -139,10 +140,11 @@ def sunSystem():
     monitor = ""
     rocket = Rocket("rocket", 100, 100, 0, 0, 5, 10, (100, 0, 100), True)
     bodys[rocket.name] = rocket
-    addBody("earth", 400, 450, 0, -10, 30, 2000, (50, 100, 100), False)
-    addBody("moon", 340, 450, 0, -6, 10, 10, (100, 0, 0), True)
-    addBody("sun", 750, 450, 0, 0, 70, 20000, (100, 100, 0), False)
+    addBody("earth", 500, 450, 0, -10, 30, 1800, (50, 100, 100), False)
+    addBody("moon", 440, 450, 0, -8, 10, 10, (100, 0, 0), True)
+    addBody("sun", 750, 450, 0, 0, 70, 4000000, (100, 100, 0), False)
 
+""" Game - Gravity """
 def gravityTest():
     global isObjective
     global center
@@ -151,7 +153,7 @@ def gravityTest():
     bodys.clear()
     monitor = ""
     center = "center"
-    addBody("center", x_offset, y_offset, 0, 0, 40, 10000, (100, 100, 0), False)
+    addBody("center", x_offset, y_offset, 0, 0, 40, 2000000, (100, 100, 0), False)
 
     for i in range(100):
         r1 = random.randint(0, 100)
@@ -162,6 +164,7 @@ def gravityTest():
         r = random.randint(1, 10)
         addBody(str(i), x, y, 0, 0, r, 3, (r1, r2, r3), True)
 
+""" Game - Inelastic collision """
 def unElasticTest():
     global monitor, center
     bodys.clear()
@@ -170,6 +173,7 @@ def unElasticTest():
     addBody("1", 0, 450, 4, 0, 60, 1000, (50, 100, 100), False)
     addBody("2", 1280, 450, -4, 0, 60, 1000, (50, 100, 100), False)
 
+""" Game - Inelastic collision with angle """
 def unElasticTestWithAngle():
     global monitor, center
     bodys.clear()
@@ -178,6 +182,7 @@ def unElasticTestWithAngle():
     addBody("1", 640, 0, 0, 4, 60, 1000, (50, 100, 100), False)
     addBody("2", 1280, 550, -4, 0, 60, 1000, (50, 100, 100), False)
 
+""" Game - elastic collision """
 def elasticTest():
     global monitor, center
     bodys.clear()
@@ -186,6 +191,7 @@ def elasticTest():
     addBody("1", 0, 450, 4, 0, 60, 1000, (100, 0, 0), True)
     addBody("2", 1280, 450, -4, 0, 60, 1000, (0, 100, 0), True)
 
+""" Game - elastic collision with angle """
 def elasticTestWithAngle():
     global monitor, center
     bodys.clear()
@@ -194,6 +200,7 @@ def elasticTestWithAngle():
     addBody("1", 640, 0, 0, 4, 60, 1000, (100, 0, 0), True)
     addBody("2", 1280, 550, -4, 0, 60, 1000, (0, 100, 0), True)
 
+""" Game - A bunch of randomly placed planets with random mass and stuff """
 def bigBang():
     global monitor
     global center
@@ -217,6 +224,7 @@ def bigBang():
         m = random.randint(1, 100)
         addBody(str(i), x, y, x_vel, y_vel, r, m, (r1, r2, r3), True)
 
+""" Game - A rocket can push a bunch of smaller objects placed in a line """
 def rockyroad():
     global monitor
     global center
@@ -316,7 +324,7 @@ def gravitation(b1, b2):
     if r == 0:
         r = 0.1
     theta = math.atan2((b1.x_pos - b2.x_pos), b1.y_pos - b2.y_pos)
-    f = g*b1.m*b2.m/r
+    f = g*b1.m*b2.m/(r**2)
     b1.x_vel -= f/b1.m * math.sin(theta)
     b1.y_vel -= f/b1.m * math.cos(theta)
     b2.x_vel += f/b2.m * math.sin(theta)
