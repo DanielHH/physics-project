@@ -290,11 +290,18 @@ def collison(b1, b2):
         b1.y_pos += d * math.cos(theta) / 2
         b2.y_pos -= d * math.cos(theta) / 2
 
-
-        b2.x_vel = (b1.m * b1.x_vel) / b2.m
-        b2.y_vel = (b1.m * b1.y_vel) / b2.m
-        b1.x_vel = -((b2.m * b2.x_vel) / b1.m)
-        b1.y_vel = -((b2.m * b2.y_vel) / b1.m)
+        new_b2_x_vel = b2.x_vel + (p * b2.m * normal[0])
+        new_b2_y_vel = b2.y_vel + (p * b2.m * normal[1])
+        new_b1_x_vel = b1.x_vel - (p * b1.m * normal[0])
+        new_b1_y_vel = b1.y_vel - (p * b1.m * normal[1])
+        b2.x_vel = new_b2_x_vel
+        b2.y_vel = new_b2_y_vel
+        b1.x_vel = new_b1_x_vel
+        b1.y_vel = new_b1_y_vel
+        #b2.x_vel = (b1.m * b1.x_vel) / b2.m
+        #b2.y_vel = (b1.m * b1.y_vel) / b2.m
+        #b1.x_vel = -((b2.m * b2.x_vel) / b1.m)
+        #b1.y_vel = -((b2.m * b2.y_vel) / b1.m)
     else:
         if b1.name == "rocket" or b2.name == "rocket":
             gameOver = True
