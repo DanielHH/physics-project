@@ -70,7 +70,7 @@ def update(dt):
                 sunSystem()
                 restart()
             if b4.collidepoint(pos):
-                rockyroad()
+                bigBang()
                 restart()
         if event.type == KEYDOWN:
             if event.key == K_SPACE:
@@ -85,13 +85,13 @@ def update(dt):
         time = dt*0.01
         if "rocket" in bodys:
             if keys[K_LEFT]:
-                bodys["rocket"].x_vel -= 1 * time
+                bodys["rocket"].x_vel -= 2 * time
             if keys[K_RIGHT]:
-                bodys["rocket"].x_vel += 1 * time
+                bodys["rocket"].x_vel += 2 * time
             if keys[K_DOWN]:
-                bodys["rocket"].y_vel += 1 * time
+                bodys["rocket"].y_vel += 2 * time
             if keys[K_UP]:
-                bodys["rocket"].y_vel -= 1 * time
+                bodys["rocket"].y_vel -= 2 * time
 
         combinations = itertools.combinations(bodys, 2)
         for c in combinations:
@@ -281,19 +281,19 @@ def collison(b1, b2):
     if b1.p and b2.p:
         d = (b1.r + b2.r) - distance(b1, b2)
         theta = math.atan2(b1.x_pos - b2.x_pos, b1.y_pos - b2.y_pos)
-        normal = get_vector((b1.x_pos,b1.y_pos), (b2.x_pos,  b2.y_pos))
-        dot_b1 = dot_product((b1.x_vel,b1.y_vel), normal)
-        dot_b2 = dot_product((b2.x_vel,b2.y_vel), normal)
-        p = float((2.0 * (dot_b1-dot_b2)) / (b1.m + b2.m))
+        impulse_v = get_vector((b1.x_pos, b1.y_pos), (b2.x_pos,  b2.y_pos))
+        dot_b1 = dot_product((b1.x_vel, b1.y_vel), impulse_v)
+        dot_b2 = dot_product((b2.x_vel, b2.y_vel), impulse_v)
+        common_components = (2.0 * (dot_b1-dot_b2)) / (b1.m + b2.m)
         b1.x_pos += d * math.sin(theta) / 2
         b2.x_pos -= d * math.sin(theta) / 2
         b1.y_pos += d * math.cos(theta) / 2
         b2.y_pos -= d * math.cos(theta) / 2
 
-        new_b2_x_vel = b2.x_vel + (p * b2.m * normal[0])
-        new_b2_y_vel = b2.y_vel + (p * b2.m * normal[1])
-        new_b1_x_vel = b1.x_vel - (p * b1.m * normal[0])
-        new_b1_y_vel = b1.y_vel - (p * b1.m * normal[1])
+        new_b2_x_vel = b2.x_vel + (common_components * b2.m * impulse_v[0])
+        new_b2_y_vel = b2.y_vel + (common_components * b2.m * impulse_v[1])
+        new_b1_x_vel = b1.x_vel - (common_components * b1.m * impulse_v[0])
+        new_b1_y_vel = b1.y_vel - (common_components * b1.m * impulse_v[1])
         b2.x_vel = new_b2_x_vel
         b2.y_vel = new_b2_y_vel
         b1.x_vel = new_b1_x_vel
@@ -389,7 +389,7 @@ def draw(screen):
     if gamePaused:
         drawPauseMenu(screen, myfont)
     if win:
-        pausedgame = myfont.render("You win the moon is now lose in the universe!", False, (100, 100, 100))
+        pausedgame = myfont.render("You win the moon is now lost in the universe!", False, (100, 100, 100))
         screen.blit(pausedgame, (x_offset - 300, y_offset - 200))
     if gameOver:
         pausedgame = myfont.render("You lose! Chose new game mode", False, (100, 100, 100))
